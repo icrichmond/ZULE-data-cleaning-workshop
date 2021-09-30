@@ -22,14 +22,13 @@ dtdf <- fread("input/example-data.csv", sep = ";")
 # that's slightly better, but we still have the problem that the first 7 lines in tidyverse and first 8 lines in data.table need to be removed for this to be functional 
 tdf <- read_delim("input/example-data.csv", delim = ";", skip = 8)
 dtdf <- fread("input/example-data.csv", sep = ";", skip = 8)
-
 # adding the skip argument fixes our problems! Now we can move on to other formatting issues... 
 
 
 
 
 #### 2. Special Characters & UTF-8 encoding ---------------------
-# What would life in Québec be without special characters! When we investigate our tidyverse dataframe, we see an issue with "Montréal" 
+# What would life in Qu?bec be without special characters! When we investigate our tidyverse dataframe, we see an issue with "Montr?al" 
 # This issue often arises with accents and other special characters, when the dataframe is not properly read as UTF-8
 # Luckily, we have an easy fix for this! 
 # tidyverse can be re-encoded after import 
@@ -125,15 +124,49 @@ dtdf$Species <- gsub(",","",dtdf$Species)
 #### 7. Date/Time Formatting -----------------------------------
 # date and time formatting in R can be really tricky and frustrating sometimes but is often really necessary for field data (and other data)
 # anytime is a cool package that makes the process a little bit easier 
+# first we want a date-time column, not separate entities 
+# tidyverse 
+tdf <- unite(tdf, "DateTime", Date:Time, sep = " ")
+# data.table 
+dtdf[,DateTime:=paste0(Date," ",Time)]
+dtdf[, c("Date","Time"):=NULL]
+
+# now use anytime to format the columns
+# NOTE: Be careful of time zones, anytime will automatically set to where you are 
+# if you are using data from other time zones and need to indicate that, use the parsedate package
+tdf$DateTime <- anytime(tdf$DateTime)
+dtdf$DateTime <- anytime(dtdf$DateTime)
+
 
 
 
 #### 8. Reshaping ----------------------------------------------
+# often the way datasets are initially set up are not ideal for things like plotting and modelling
+# so we need to reshape the dataframe - make it longer or wider - so we can do what we need to do
+# let's make the dataframe wider - we only want one entry per city 
+# tidyverse
+tdf_wide <- pivot_wider(tdf, names_from = City, values_from = DBH)
+
+# mmmmm that is not the most useful format - let's make it longer again (or melt it)
+tdf_long <- pivot_longer(tdf_wide, !Species, names_to = "City", values_to = "DBH")
+
+#dcast for data.table
 
 
 
 
 #### 9. Saving/Exporting Data ----------------------------------
+# don't forget to save your beautiful, cleaned data!
+# maybe you have a "cleaned" folder in your input directory, save it there
+# if this is a final product, save it to output 
+# if this is an intermediate item, the best way to save it is as an .rds file 
+# if this is a final product or something you will be sharing, save it as a .csv
+# tidyverse 
+saveRDS(tdf, "output/TidyData.rds")
+write_csv(tdf, "output/TidyData.csv")
+# data.table
+saveRDS(dtdf, "output/DataTableData.rds")
+fwrite(dtdf, "output/DataTableData.csv")
 
 
 #### BONUS: Piping ---------------------------------------------
