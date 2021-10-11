@@ -169,22 +169,278 @@ Two big "ecosystems" for data cleaning in R
 ---
 class: review
 # Part 4: Practice cleaning messy Data in R
-I have created a spreadsheet that integrates MANY of the common problems in datasets... We are going to go through step by step and clean this dataset so it is ready for analysis.  
-NOTE: code is provided using both tidyverse and data.table philosophies in this workshop. Feel free to choose whichever one makes sense to you in the future (or mix & match!). Providing multiple ways to do everything was meant to give you options, not confuse you
+I have created a spreadsheet that integrates MANY of the common problems in datasets... We are going to go through step by step and clean this dataset so it is ready for analysis.   
+
+
+
+**NOTE:** code is provided using both tidyverse and data.table philosophies in this workshop. Feel free to choose whichever one makes sense to you in the future (or mix & match!). Providing multiple ways to do everything was meant to give you options, not confuse you  
+
+
+**NOTE 2:** this code assumes you set up your files in an R project with the datasheet in an `input/` folder
+
 
 ---
 class: review
 # Part 4: Practice cleaning messy Data in R
 
-Problem: 
-.pull-left[
+## Problem: Importing Data   
+
 `tidyverse`
-]
+```{r, echo = T, eval= F}
+# initial import
+tdf <- read_csv("input/example-data.csv")
+# read_csv doesn't recognize that the file is delimited using ";" instead of ",". Let's use read_delim to fix that
+tdf <- read_delim("input/example-data.csv", delim = ";")
+# we still have the problem that the first 8 lines need to be removed for this to be functional 
+tdf <- read_delim("input/example-data.csv", delim = ";", skip = 8)
+```
 
-.pull-right[
+
 `data.table`
+```{r, echo = T, eval= F}
+# initial import using data.table 
+dtdf <- fread("input/example-data.csv")
+# fread doesn't recognize that the file is delimited using ";" instead of ",". Let's add it to the data.table argument 
+dtdf <- fread("input/example-data.csv", sep = ";")
+# we still have the problem that the first 8 lines in data.table need to be removed for this to be functional 
+dtdf <- fread("input/example-data.csv", sep = ";", skip = 8)
+```
 
-]
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Special Characters & UTF-8 Encoding 
+
+What would life in Québec be without special characters! When we investigate our tidyverse dataframe, we see an issue with "Montréal". This issue often arises with accents and other special characters, when the dataframe is not properly read as UTF-8
+
+`tidyverse`
+```{r, echo = T, eval= F}
+# tidyverse can be re-encoded to UTF-8 after import 
+tdf$City <- enc2utf8(as(tdf$City, "character"))
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+# data.table incorporates it into the import line 
+dtdf <- fread("input/example-data.csv", sep = ";", skip = 8, encoding = "UTF-8") 
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: NAs & Associated Values
+
+There are often NAs in our datasets, which we may or may not want to keep often, there are also other values that count, biologically, as NAs but are not read into R automatically as NAs. For example, blanks, "NA" (instead of a true NA), zeroes (for some variables), etc.  
+`tidyverse`
+```{r, echo = T, eval= F}
+# Strategy A: When importing (for tidyverse only)
+tdf <- read_delim("input/example-data.csv", delim = ";", skip = 8, na = c(""," ", "NA", 0, "0"))
+# Strategy B: After importing
+tdf$DBH <- na_if(tdf$DBH, 0)
+# Drop the NAs
+tdf <- drop_na(tdf)
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+# Strategy B: After importing
+dtdf$DBH[dtdf$DBH == 0] <- NA 
+# Drop the NAs
+dtdf <- na.omit(dtdf)
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Duplicates
+
+Sometimes, there are duplicate observations/rows in datasets. These can really mess up your analysis if you don't catch them. Testing your dataset for duplicates and then removing what you find is an important step in data cleaning!  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+# investigate which lines are duplicates
+tdup <- tdf[duplicated(tdf), c("TreeID", "City", "DBH", "Species,")]
+# remove duplicates
+tdf <- distinct(tdf)
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+# investigate which lines are duplicates
+dtdup <- dtdf[duplicated(dtdf), c("TreeID", "City", "DBH", "Species,")]
+# remove duplicates 
+dtdf <- unique(dtdf)
+```
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Column Names
+
+Bad column names can make your life a living hell. Before moving into analysis make sure your column names follow best practices, you'll thank me later! You don't want numbers, special characters, or spaces in your column names. Let's change our really bad column names.  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+tdf <- rename(tdf, 
+              Date = "1st Date Measured",
+              Time = "Time  Measured", 
+              Species = "Species,")
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+dtdf <- setnames(dtdf,                              
+                 c("1st Date Measured", "Time  Measured", "Species,"),
+                 c("Date", "Time", "Species"))
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Value Formatting - Spelling Mistakes
+
+In our dataset, Toronto is spelled wrong. If you have a huge dataset with many spelling errors, OpenRefine is a great tool to use. For us, our dataset is small and we can visually inspect it for spelling errors so we will replace the error in R.  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+tdf$City <- recode(tdf$City, Toronno = "Toronto")
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+dtdf$City[dtdf$City %in% c("Toronno", "TO", "The birthplace of Drake")] <- "Toronto"
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Value Formatting - Formatting Column Types
+
+City and species are currently formatted as character types, but for our study we want them to act as factors - we need to reclassify them. Its always important to check the classes of your data, R makes assumptions when importing your data and can be wrong!  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+tdf$City <- as_factor(tdf$City)
+tdf$Species <- as_factor(tdf$Species)
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+factor_cols <- c("City", "Species")
+dtdf[ ,(factor_cols) := lapply(.SD, as.factor),
+      .SDcols = factor_cols]
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Value Formatting - Text Parsing
+We have a comma at the end of our species names, that we don't really want. We can use text parsing to remove those unwanted commas from the Species column.  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+tdf$Species <- str_remove(tdf$Species, "[,]") # this will remove a comma anywhere in the column
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+dtdf$Species <- gsub(",","",dtdf$Species)
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Date/Time Formatting
+
+Date and time formatting in R can be really tricky and frustrating sometimes but is often really necessary for field data (and other data). `anytime` is a cool package that makes the process a little bit easier. First we want a date-time column, not separate entities   
+`tidyverse`
+```{r, echo = T, eval= F}
+tdf <- unite(tdf, "DateTime", Date:Time, sep = " ")
+```
+
+`data.table`
+```{r, echo = T, eval= F}
+dtdf[,DateTime:=paste0(Date," ",Time)]
+dtdf[, c("Date","Time"):=NULL]
+```
+
+Now we use anytime to format the columns.
+NOTE: Be careful of time zones, anytime will automatically set to where you are. If you are using data from other time zones and need to indicate that, use the `parsedate` package. 
+```{r, echo = T, eval = F}
+tdf$DateTime <- anytime(tdf$DateTime)
+dtdf$DateTime <- anytime(dtdf$DateTime)
+```
+
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Reshaping
+Often the way datasets are initially set up are not ideal for things like plotting and modelling (they don't follow tidy data practices). So we need to reshape the dataframe - make it longer or wider - to do what we need to do.  
+
+`tidyverse`
+```{r, echo = T, eval= F}
+# let's make the dataframe wider - we only want one entry per city 
+tdf_wide <- pivot_wider(tdf, names_from = Species, values_from = DBH)
+# Hmmmmm that is not the most useful format - let's make it longer again (or melt it)
+tdf_long <- pivot_longer(tdf_wide, cols = 4:14, names_to = "Species", values_to = "DBH", values_drop_na = T)
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+# dcast and melt for data.table
+dtdf_wide <- dcast(dtdf, formula = City + TreeID + DateTime ~ Species, value.var = "DBH")
+dtdf_long <- melt(dtdf_wide, id.vars = c("TreeID","City", "DateTime"), variable.name = "Species", value.name = "DBH", na.rm = T) 
+```
+
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
+
+## Problem: Saving/Exporting Data
+Don't forget to save your beautiful, cleaned data! Maybe you have a "cleaned" folder in your input directory, save it there.  
+If this is a final product, save it to output.  
+If this is an intermediate item, the best way to save it is as an .rds file  
+If this is a final product or something you will be sharing, save it as a .csv
+
+`tidyverse`
+```{r, echo = T, eval= F}
+saveRDS(tdf, "output/TidyData.rds")
+write_csv(tdf, "output/TidyData.csv")
+```
+
+
+`data.table`
+```{r, echo = T, eval= F}
+saveRDS(dtdf, "output/DataTableData.rds")
+fwrite(dtdf, "output/DataTableData.csv")
+```
+
 
 ---
 class: important 
