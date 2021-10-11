@@ -109,27 +109,89 @@ class: review
 # Part 2: File Organization Practice 
 All together now! 
 - We are going to download messy and unstructured GitHub folder from [here](https://github.com/icrichmond/ZULE-data-cleaning-workshop) &amp; unzip 
-- Then we are going to set up an R project &amp; the file structure we just talked about 
+- Then we are going to set up an R project &amp; the file structure we just talked about  
+
+
+
+
+
+Ok... Moving on to cleaning data in R! 
 
 ---
+class: important 
 # Part 3: Cleaning Data in R 
-- Importance, why, philosophy 
+Some reasons why I clean my data in R (use the tool that works for you)
+1. Reproducible 
+2. Open-source and cross-platform
+3. Reliable &amp; clear 
+4. High-quality graphics
+5. Great community &amp; resources
+6. Scales with datasets
+7. Steep learning curve with a high payoff 
+
+.footnote[
+[1]: [Data Carpentry Data Analysis &amp; Visualiation in R for Ecologists](https://datacarpentry.org/R-ecology-lesson/00-before-we-start.html)
+]
 
 ---
+class: important
 # Part 3: Cleaning Data in R 
-- tidyverse &amp; data.table (OpenRefine)
+Two big "philosophies" for data cleaning in R 
+.pull-left[
+## `tidyverse`
+- makes functions corresponding to the most common operations 
+- "do one thing at a time approach" 
+- chain together multiple things to make a easily understood group of operations 
+- many dependencies 
+]
 
----
-# Part 3: Cleaning Data in R 
-- common errors/difficulties
+.pull-right[
+## `data.table`
+- provides a high performance version of base R 
+- no dependencies 
+- complex syntax (I think) but it is very powerful once understood and can make your code extremely efficient by combining many operations and minimizing copying data, freeing up memory
 
+]  
+
+.footnote[
+[1]: [tidyverse ](https://www.tidyverse.org/)
+[2]: [data.table ](https://rdatatable.gitlab.io/data.table/)
+[3]: [Comparison of tidyverse and data.table](https://atrebas.github.io/post/2019-03-03-datatable-dplyr/)
+]
 ---
+class: review
 # Part 4: Practice cleaning messy Data in R
-- import data 
--identify and clean mistakes within the dataset using tidyverse and/or data.table 
-- save &amp; export data 
+I have created a spreadsheet that integrates MANY of the common problems in datasets... We are going to go through step by step and clean this dataset so it is ready for analysis.  
+NOTE: code is provided using both tidyverse and data.table philosophies in this workshop. Feel free to choose whichever one makes sense to you in the future (or mix &amp; match!). Providing multiple ways to do everything was meant to give you options, not confuse you
 
+---
+class: review
+# Part 4: Practice cleaning messy Data in R
 
+Problem: 
+.pull-left[
+`tidyverse`
+]
+
+.pull-right[
+`data.table`
+
+]
+
+---
+class: important 
+# Resources 
+- [data.table in R Guide](https://www.machinelearningplus.com/data-manipulation/datatable-in-r-complete-guide/)
+- [R for Reproducible Scientific Analysis](https://swcarpentry.github.io/r-novice-gapminder/)
+- [Data Analysis &amp; Visualization in R for Ecologists](https://datacarpentry.org/R-ecology-lesson/index.html)
+- [Data Organization in Spreadsheets for Ecologists](https://datacarpentry.org/R-ecology-lesson/index.html)
+- [Tidy Data by Hadley Wickham](https://www.jstatsoft.org/article/view/v059i10)
+- [Dr. Christie Bahlai's Reproducible Quantitative Methods Course](https://cbahlai.github.io/rqm-template/)
+- [Wildlife Ecology &amp; Evolution Lab's Guide by Alec Robitaille](https://weel.gitlab.io/guide/)
+- [data.table Website](https://rdatatable.gitlab.io/data.table/)
+- [tidyverse Website](https://www.tidyverse.org/)
+- [xaringan Website: package I used to make these slides](https://slides.yihui.org/xaringan/#1)
+- [OpenRefine](https://openrefine.org/)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
