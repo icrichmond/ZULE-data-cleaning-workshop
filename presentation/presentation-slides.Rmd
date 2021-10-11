@@ -456,3 +456,8 @@ class: important
 - [tidyverse Website](https://www.tidyverse.org/)
 - [xaringan Website: package I used to make these slides](https://slides.yihui.org/xaringan/#1)
 - [OpenRefine](https://openrefine.org/)
+
+```{r, echo = F}
+library(pagedown)
+pagedown::chrome_print("/home/icrichmond/Repositories/workshops/data-cleaning/presentation/presentation-slides.html")
+```
