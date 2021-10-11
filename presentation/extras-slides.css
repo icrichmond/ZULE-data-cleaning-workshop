@@ -1,17 +1,17 @@
 /* New colors */
 
 .important {
-  background-color: #eee9bf;
+  background-color: #d9ead3;
   color: #000000;
 }
 
 .review {
-  background-color: #8b8970;
+  background-color: #d2d9ce;
   color: #000000;
 }
 
 .remark-slide-content {
-  border-top: 80px solid #8e874c;
+  border-top: 80px solid #51815b;
 }
 /* New colors */
 
@@ -28,7 +28,10 @@
   color: #000000;
 }
 
-
+/* unvisited link */
+a:link {
+  color: #51815b;
+}
 
 /* Two-column layout */
 .left-column {
