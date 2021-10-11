@@ -4,7 +4,7 @@
     <title>File Organization &amp; Data Cleaning in R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Isabella Richmond" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="extras-slides.css" type="text/css" />
@@ -15,10 +15,119 @@ class: center, middle, inverse, title-slide
 
 # File Organization &amp; Data Cleaning in R
 ### Isabella Richmond
-### October 12, 2021 [updated: September 29 2021]
+### October 12, 2021 [updated: October 11 2021]
 
 ---
 
+
+# What we are learning today &amp; why 
+- Everyone wants to learn about file organization and data cleaning/processing! So here we go! 
+
+&lt;img src="google1.png" width="1047" /&gt;
+
+---
+# What we are learning today &amp; why 
+- Everyone wants to learn about file organization and data cleaning/processing! So here we go! 
+
+&lt;img src="google2.png" width="1047" /&gt;
+
+
+---
+# A couple notes
+- Data archiving in the Ziter lab 
+  - We do have a place and and specific formatting requirements for data archiving - we can discuss this more later but this exists (reach out if this is something you want to do in the next couple of weeks)
+  
+&lt;img src="righttool.PNG" width="730" /&gt;
+.footnote[
+[1]: [Scientific Computing](https://sciencecomputing.io)
+]
+
+
+---
+class: important
+# Part 1: Data &amp; File Organization  
+## [Tidy Data](https://www.jstatsoft.org/article/view/v059i10) 
+- Tidy data is a framework for how data should be formatted for easy and efficient data cleaning created by [Hadley Wickham](http://hadley.nz/)
+  - These principles are the underpinnings of `tidyverse` packages (e.g. ggplot2)   
+
+
+## Principles 
+1. Each variable forms a column
+2. Each observation forms a row 
+2. Each type of observational unit forms a table
+
+---
+class: important 
+
+# Part 1: Data &amp; File Organization  
+## Tidy Data 
+- The best way to start data/file organization is to use best practices in data collection/spreadsheet formatting 
+- There are some really [common spreadsheet errors](https://datacarpentry.org/spreadsheet-ecology-lesson/02-common-mistakes/index.html) that ecologists often use when collecting data 
+- We are not going to format a spreadsheet today, but I'd encourage you to take a look at that link and incorporate suggestions next time you're collecting/inputting data
+
+
+---
+class: important 
+# Part 1: Data &amp; File Organization 
+Good file structure is important because it: 
+- Ensures the integrity of your data 
+- Makes it easier to share your code with people 
+- Makes it easier to upload your code/data with manuscript submission 
+- Makes it easier to come back after a break 
+
+Best practices include (but are not limited to): 
+- Use an R Project file so that your project is easily shareable
+- Always treat raw data as read-only
+- Store cleaned data in a separate folder (or distinguish clearly)
+- Treat output as disposable - you should always be able to re-generate with script
+- Have separate function and figure scripts
+
+.footnote[
+[1]: [Software Carpentry Project Management](https://swcarpentry.github.io/r-novice-gapminder/02-project-intro/index.html)
+]
+
+---
+class: important 
+
+# Part 1: Data &amp; File Organization
+
+This is how I set up my file structure with my R Projects. If you want more examples, most of my repositories on [GitHub](https://github.com/icrichmond/) are set up in in the same (or very similar manner): 
+
+&lt;img src="filestructure.png" width="1833" /&gt;
+
+---
+class: important 
+
+# Part 1: Data &amp; File Organization
+
+This is how I set up my file structure with my R Projects. If you want more examples, most of my repositories on [GitHub](https://github.com/icrichmond/) are set up in in the same (or very similar manner): 
+
+&lt;img src="filestructure2.png" width="1831" /&gt;
+
+---
+class: review
+# Part 2: File Organization Practice 
+All together now! 
+- We are going to download messy and unstructured GitHub folder from [here](https://github.com/icrichmond/ZULE-data-cleaning-workshop) &amp; unzip 
+- Then we are going to set up an R project &amp; the file structure we just talked about 
+
+---
+# Part 3: Cleaning Data in R 
+- Importance, why, philosophy 
+
+---
+# Part 3: Cleaning Data in R 
+- tidyverse &amp; data.table (OpenRefine)
+
+---
+# Part 3: Cleaning Data in R 
+- common errors/difficulties
+
+---
+# Part 4: Practice cleaning messy Data in R
+- import data 
+-identify and clean mistakes within the dataset using tidyverse and/or data.table 
+- save &amp; export data 
 
 
     </textarea>
