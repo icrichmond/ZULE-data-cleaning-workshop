@@ -22,13 +22,14 @@ dtdf <- fread("input/example-data.csv", sep = ";")
 # that's slightly better, but we still have the problem that the first 7 lines in tidyverse and first 8 lines in data.table need to be removed for this to be functional 
 tdf <- read_delim("input/example-data.csv", delim = ";", skip = 8)
 dtdf <- fread("input/example-data.csv", sep = ";", skip = 8)
+
 # adding the skip argument fixes our problems! Now we can move on to other formatting issues... 
 
 
 
 
 #### 2. Special Characters & UTF-8 encoding ---------------------
-# What would life in Qu?bec be without special characters! When we investigate our tidyverse dataframe, we see an issue with "Montr?al" 
+# What would life in Québec be without special characters! When we investigate our tidyverse dataframe, we see an issue with "Montréal" 
 # This issue often arises with accents and other special characters, when the dataframe is not properly read as UTF-8
 # Luckily, we have an easy fix for this! 
 # tidyverse can be re-encoded after import 
@@ -145,12 +146,14 @@ dtdf$DateTime <- anytime(dtdf$DateTime)
 # so we need to reshape the dataframe - make it longer or wider - so we can do what we need to do
 # let's make the dataframe wider - we only want one entry per city 
 # tidyverse
-tdf_wide <- pivot_wider(tdf, names_from = City, values_from = DBH)
+tdf_wide <- pivot_wider(tdf, names_from = Species, values_from = DBH)
 
-# mmmmm that is not the most useful format - let's make it longer again (or melt it)
-tdf_long <- pivot_longer(tdf_wide, !Species, names_to = "City", values_to = "DBH")
+# Hmmmmm that is not the most useful format - let's make it longer again (or melt it)
+tdf_long <- pivot_longer(tdf_wide, cols = 4:14, names_to = "Species", values_to = "DBH", values_drop_na = T)
 
-#dcast for data.table
+# dcast and melt for data.table
+dtdf_wide <- dcast(dtdf, formula = City + TreeID + DateTime ~ Species, value.var = "DBH")
+dtdf_long <- melt(dtdf_wide, id.vars = c("TreeID","City", "DateTime"), variable.name = "Species", value.name = "DBH", na.rm = T) 
 
 
 
@@ -169,7 +172,28 @@ saveRDS(dtdf, "output/DataTableData.rds")
 fwrite(dtdf, "output/DataTableData.csv")
 
 
+
+
 #### BONUS: Piping ---------------------------------------------
 # you may be wondering why tidyverse has so many seemingly redundant functions with baseR
-# the tidyverse allows you to do something called piping, which can make your code much more efficient 
+# the tidyverse allows you to do something called piping (%>%), which can make your code much more efficient 
 # for example, if we took all the tidyverse code from above and piped it together, it would look like this: 
+tdf <- read_delim("input/example-data.csv", delim = ";", skip = 8)
+tdf$City <- enc2utf8(as(tdf$City, "character"))
+
+tdf <- tdf %>%
+  na_if(0) %>%
+  drop_na() %>%
+  distinct() %>%
+  rename(Date = "1st Date Measured",
+         Time = "Time  Measured", 
+         Species = "Species,") %>%
+  mutate(City = recode(City, Toronno = "Toronto")) %>% 
+  mutate(City = as_factor(City)) %>%
+  mutate(Species = as_factor(Species)) %>%
+  mutate(Species = str_remove(Species, "[,]")) %>%
+  unite("DateTime", Date:Time, sep = " ") %>%
+  mutate(DateTime = anytime(DateTime)) %>% 
+  pivot_wider(names_from = Species, values_from = DBH) %>%
+  pivot_longer(cols = 4:14, names_to = "Species", values_to = "DBH", values_drop_na = T) %>%
+  write_csv("output/TidyData.csv")
